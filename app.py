@@ -37,6 +37,11 @@ def add_task():
     return jsonify(new_task.__dict__), 201
 
 
+@app.route("/tasks", methods=["GET"])
+def get_tasks():
+    return jsonify(tasks)
+
+
 def save_tasks():
     with open(task_file, "w") as file:
         json.dump(tasks, file)
