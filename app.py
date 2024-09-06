@@ -50,6 +50,14 @@ def get_task(id):
     return jsonify(task)
 
 
+@app.route("/tasks/<int:id>", methods=["DELETE"])
+def delete_task(id):
+    global tasks
+    tasks = [task for task in tasks if task["id"] != id]
+    save_tasks()
+    return "", 204
+
+
 def save_tasks():
     with open(task_file, "w") as file:
         json.dump(tasks, file)
