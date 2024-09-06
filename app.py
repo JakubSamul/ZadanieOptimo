@@ -42,6 +42,14 @@ def get_tasks():
     return jsonify(tasks)
 
 
+@app.route("/tasks/<int:id>", methods=["GET"])
+def get_task(id):
+    task = next((task for task in tasks if task["id"] == id), None)
+    if task is None:
+        abort(404, description="Task not found")
+    return jsonify(task)
+
+
 def save_tasks():
     with open(task_file, "w") as file:
         json.dump(tasks, file)
