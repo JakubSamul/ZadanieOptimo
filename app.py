@@ -58,6 +58,23 @@ def delete_task(id):
     return "", 204
 
 
+@app.route("/tasks/<int:id>", methods=["PUT"])
+def update_task(id):
+    task = next((task for task in tasks if task["id"] == id), None)
+    if task is None:
+        abort(404, description="Task not found")
+    data = request.get_json()
+    if "title" in data and not data["title"]:
+        abort(400, description="Title cannot be empty")
+    if "description" in data and not data["description"]:
+        abort(400, description="Description cannot be empty")
+    task["title"] = data.get("title", task["title"])
+    task["description"] = data.get("description", task["description"])
+    task["status"] = data.get("status", task["status"])
+    save_tasks()
+    return jsonify(task)
+
+
 def save_tasks():
     with open(task_file, "w") as file:
         json.dump(tasks, file)
