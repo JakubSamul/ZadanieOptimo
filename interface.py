@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 task_file = "tasks.json"
 
@@ -102,4 +103,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("Zamknięcie programu z klawiatury")

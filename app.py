@@ -27,7 +27,7 @@ def add_task():
     if data.get("title") or data.get("description") == "":
         abort(
             400,
-            description="Title and description are required and cannot be empty",
+            description="Tytuł i opis są wymagane i nie mogą być puste",
         )
     new_task = Task(
         id=len(tasks) + 1, title=data["title"], description=data["description"]
@@ -46,7 +46,7 @@ def get_tasks():
 def get_task(id):
     task = next((task for task in tasks if task["id"] == id), None)
     if task is None:
-        abort(404, description="Task not found")
+        abort(404, description="Nie znaleziono zadania")
     return jsonify(task)
 
 
@@ -54,6 +54,8 @@ def get_task(id):
 def delete_task(id):
     global tasks
     tasks = [task for task in tasks if task["id"] != id]
+    for index, task in enumerate(tasks):
+        task["id"] = index + 1
     save_tasks()
     return "", 204
 
@@ -62,12 +64,12 @@ def delete_task(id):
 def update_task(id):
     task = next((task for task in tasks if task["id"] == id), None)
     if task is None:
-        abort(404, description="Task not found")
+        abort(404, description="Nie znaleziono zadania")
     data = request.get_json()
     if "title" in data and not data["title"]:
-        abort(400, description="Title cannot be empty")
+        abort(400, description="Tytył nie może być pusty")
     if "description" in data and not data["description"]:
-        abort(400, description="Description cannot be empty")
+        abort(400, description="Opis nie może być pusty")
     task["title"] = data.get("title", task["title"])
     task["description"] = data.get("description", task["description"])
     task["status"] = data.get("status", task["status"])
