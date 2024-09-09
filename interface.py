@@ -1,6 +1,5 @@
 import json
 import os
-import sys
 
 task_file = "tasks.json"
 
@@ -25,7 +24,7 @@ def menu():
     print("4. Usuń zadanie")
     print("5. Aktualizuj zadanie")
     print("0.  Wyjście")
-    choice = input("Wybierz jedną z opcji: ")
+    choice = input("Wybierz jedną z opcji: \n")
     return choice
 
 
@@ -40,7 +39,7 @@ def add_task(tasks):
     }
     tasks.append(new_task)
     save_tasks(tasks)
-    print("Zadanie dodane")
+    print("Zadanie dodane \n")
 
 
 def list_tasks(tasks):
@@ -61,14 +60,14 @@ def delete_task(tasks):
     id = int(input("Podaj id zadania: "))
     tasks = [task for task in tasks if task["id"] != id]
     save_tasks(tasks)
-    print("Zadanie usunięte")
+    print("Zadanie usunięte \n")
 
 
 def update_task(tasks):
     id = int(input("Podaj id zadania: "))
     task = next((task for task in tasks if task["id"] == id), None)
     if task is None:
-        print("Nie znaleziono zadania")
+        print("Nie znaleziono zadania \n")
     else:
         title = input(f"Podaj nowy tytuł ({task['title']}): ")
         description = input(f"Podaj nowy opis ({task['description']}): ")

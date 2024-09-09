@@ -24,11 +24,6 @@ class Task:
 @app.route("/tasks", methods=["POST"])
 def add_task():
     data = request.get_json()
-    if data.get("title") or data.get("description") == "":
-        abort(
-            400,
-            description="Tytuł i opis są wymagane i nie mogą być puste",
-        )
     new_task = Task(
         id=len(tasks) + 1, title=data["title"], description=data["description"]
     )
@@ -66,10 +61,6 @@ def update_task(id):
     if task is None:
         abort(404, description="Nie znaleziono zadania")
     data = request.get_json()
-    if "title" in data and not data["title"]:
-        abort(400, description="Tytył nie może być pusty")
-    if "description" in data and not data["description"]:
-        abort(400, description="Opis nie może być pusty")
     task["title"] = data.get("title", task["title"])
     task["description"] = data.get("description", task["description"])
     task["status"] = data.get("status", task["status"])
