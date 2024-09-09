@@ -4,7 +4,9 @@ import shutil
 
 import pytest
 
-from app import app, task_file, tasks
+from app import app, service
+
+task_file = "tasks.json"
 
 
 @pytest.fixture
@@ -13,7 +15,7 @@ def client():
     user = app.test_client()
     if os.path.exists(task_file):
         shutil.copy(task_file, f"{task_file}.bak")
-    tasks.clear()
+    service.clear_tasks()
     if os.path.exists(task_file):
         os.remove(task_file)
     yield user

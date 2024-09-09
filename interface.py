@@ -59,8 +59,11 @@ def get_task(tasks):
 def delete_task(tasks):
     id = int(input("Podaj id zadania: "))
     tasks = [task for task in tasks if task["id"] != id]
+    for index, task in enumerate(tasks):
+        task["id"] = index + 1
     save_tasks(tasks)
     print("Zadanie usunięte \n")
+    return tasks
 
 
 def update_task(tasks):

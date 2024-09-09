@@ -1,45 +1,31 @@
-import json
-import os
-
 from flask import Flask, abort, jsonify, request
+
+from data_base import DataBase
+from model import Task
+from service import TaskService
 
 app = Flask(__name__)
 
-tasks = []
-task_file = "tasks.json"
+db = DataBase()
 
-if os.path.exists(task_file):
-    with open(task_file, "r") as file:
-        tasks = json.load(file)
-
-
-class Task:
-    def __init__(self, id, title, description, status="do zrobienia"):
-        self.id = id
-        self.title = title
-        self.description = description
-        self.status = status
+service = TaskService(db)
 
 
 @app.route("/tasks", methods=["POST"])
 def add_task():
     data = request.get_json()
-    new_task = Task(
-        id=len(tasks) + 1, title=data["title"], description=data["description"]
-    )
-    tasks.append(new_task.__dict__)
-    save_tasks()
-    return jsonify(new_task.__dict__), 201
+    task = service.add_task(Task(**data))
+    return jsonify(task.__dict__), 201
 
 
 @app.route("/tasks", methods=["GET"])
 def get_tasks():
-    return jsonify(tasks)
+    return jsonify(service.get_tasks())
 
 
 @app.route("/tasks/<int:id>", methods=["GET"])
 def get_task(id):
-    task = next((task for task in tasks if task["id"] == id), None)
+    task = service.get_task(id)
     if task is None:
         abort(404, description="Nie znaleziono zadania")
     return jsonify(task)
@@ -47,30 +33,19 @@ def get_task(id):
 
 @app.route("/tasks/<int:id>", methods=["DELETE"])
 def delete_task(id):
-    global tasks
-    tasks = [task for task in tasks if task["id"] != id]
-    for index, task in enumerate(tasks):
-        task["id"] = index + 1
-    save_tasks()
+    service.delete_task(id)
     return "", 204
 
 
 @app.route("/tasks/<int:id>", methods=["PUT"])
 def update_task(id):
-    task = next((task for task in tasks if task["id"] == id), None)
+    task = service.get_task(id)
     if task is None:
         abort(404, description="Nie znaleziono zadania")
     data = request.get_json()
-    task["title"] = data.get("title", task["title"])
-    task["description"] = data.get("description", task["description"])
-    task["status"] = data.get("status", task["status"])
-    save_tasks()
+    data["id"] = id
+    task = service.update_task(id, Task(**request.get_json()))
     return jsonify(task)
-
-
-def save_tasks():
-    with open(task_file, "w") as file:
-        json.dump(tasks, file)
 
 
 if __name__ == "__main__":
