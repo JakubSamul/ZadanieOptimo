@@ -1,111 +1,103 @@
-import json
-import os
+from database import DataBase
+from models import Task, TaskCreateModel
+from service import TaskService
 
-task_file = "tasks.json"
+db = DataBase()
 
-
-def load_tasks():
-    tasks = []
-    if os.path.exists(task_file):
-        with open(task_file, "r") as file:
-            tasks = json.load(file)
-    return tasks
-
-
-def save_tasks(tasks):
-    with open(task_file, "w") as file:
-        json.dump(tasks, file)
+service = TaskService(db)
 
 
 def menu():
-    print("1. Dodaj zadanie")
-    print("2. Lisa zadań")
-    print("3. Zadanie")
-    print("4. Usuń zadanie")
-    print("5. Aktualizuj zadanie")
-    print("0.  Wyjście")
-    choice = input("Wybierz jedną z opcji: \n")
-    return choice
-
-
-def add_task(tasks):
-    title = input("Podaj tytuł: ")
-    description = input("Podaj opis: ")
-    new_task = {
-        "id": len(tasks) + 1,
-        "title": title,
-        "description": description,
-        "status": "do zrobienia",
-    }
-    tasks.append(new_task)
-    save_tasks(tasks)
-    print("Zadanie dodane \n")
-
-
-def list_tasks(tasks):
-    for task in tasks:
-        print(f"{task['id']}. {task['title']} - {task['status']}")
-
-
-def get_task(tasks):
-    id = int(input("Podaj id zadania: "))
-    task = next((task for task in tasks if task["id"] == id), None)
-    if task is None:
-        print("Nie znaleziono zadania")
-    else:
-        print(f"{task['title']} - {task['description']} - {task['status']}")
-
-
-def delete_task(tasks):
-    id = int(input("Podaj id zadania: "))
-    tasks = [task for task in tasks if task["id"] != id]
-    for index, task in enumerate(tasks):
-        task["id"] = index + 1
-    save_tasks(tasks)
-    print("Zadanie usunięte \n")
-    return tasks
-
-
-def update_task(tasks):
-    id = int(input("Podaj id zadania: "))
-    task = next((task for task in tasks if task["id"] == id), None)
-    if task is None:
-        print("Nie znaleziono zadania \n")
-    else:
-        title = input(f"Podaj nowy tytuł ({task['title']}): ")
-        description = input(f"Podaj nowy opis ({task['description']}): ")
-        status = input(f"Podaj nowy status ({task['status']}): ")
-        task["title"] = title if title else task["title"]
-        task["description"] = (
-            description if description else task["description"]
-        )
-        task["status"] = status if status else task["status"]
-        save_tasks(tasks)
-        print("Zadanie zaktualizowane")
-
-
-def main():
-    tasks = load_tasks()
     while True:
-        choice = menu()
+        print("1. Dodaj zadanie")
+        print("2. Lista zadań")
+        print("3. Pokaż zadanie")
+        print("4. Usuń zadanie")
+        print("5. Aktualizuj zadanie")
+        print("6. Aktualizuj status")
+        print("0. Wyjście")
+        choice = input("Wybierz jedną z opcji: \n")
         if choice == "1":
-            add_task(tasks)
+            add_task()
         elif choice == "2":
-            list_tasks(tasks)
+            list_tasks()
         elif choice == "3":
-            get_task(tasks)
+            show_task()
         elif choice == "4":
-            delete_task(tasks)
+            delete_task()
         elif choice == "5":
-            update_task(tasks)
+            update_task()
+        elif choice == "6":
+            update_status()
         elif choice == "0":
             break
         else:
-            print("Nieznana opcja")
+            print("Nieprawidłowy wybór, spróbuj ponownie.")
+
+
+def add_task():
+    title = input("Podaj tytuł: ")
+    description = input("Podaj opis: ")
+    data = {"title": title, "description": description}
+    task_data = TaskCreateModel(**data)
+    task = service.add_task(task_data)
+    print(
+        f"Dodano zadanie: {task.id} - {task.title} - {task.description} - {task.status}"
+    )
+
+
+def list_tasks():
+    for task in service.get_tasks():
+        print(f"{task.id} - {task.title} - {task.description} - {task.status}")
+
+
+def show_task():
+    id = int(input("Podaj id zadania: "))
+    task = service.get_task(id)
+    if task is None:
+        print("Nie znaleziono zadania")
+    else:
+        print(f"{task.id} - {task.title} - {task.description} - {task.status}")
+
+
+def delete_task():
+    id = int(input("Podaj id zadania: "))
+    service.delete_task(id)
+    print(f"Usunięto zadanie: {id}")
+
+
+def update_task():
+    id = int(input("Podaj id zadania: "))
+    task = service.get_task(id)
+    if task is None:
+        print("Nie znaleziono zadania")
+    else:
+        title = input("Podaj nowy tytuł: ")
+        description = input("Podaj nowy opis: ")
+        status = input("Podaj nowy status: ")
+        task = service.update_task(
+            id, Task(id, title=title, description=description, status=status)
+        )
+        print(
+            f"Zaktualizowano zadanie: {task.id} - {task.title} - {task.description} - {task.status}"
+        )
+
+
+def update_status():
+    id = int(input("Podaj id zadania: "))
+    task = service.get_task(id)
+    if task is None:
+        print("Nie znaleziono zadania")
+    else:
+        status = input("Podaj nowy status: ")
+        task = service.update_status(id, status)
+        print(
+            f"Zaktualizowano status zadania: {task.id} - {task.title} - {task.description} - {task.status}"
+        )
 
 
 if __name__ == "__main__":
     try:
-        main()
+        menu()
     except KeyboardInterrupt:
         print("Zamknięcie programu z klawiatury")

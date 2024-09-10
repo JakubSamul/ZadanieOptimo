@@ -1,0 +1,6 @@
+Flask
+black
+pre-commit
+mypy
+pytest
+typing-extensions

@@ -28,10 +28,8 @@ def test_add_task(client):
         "/tasks",
         data=json.dumps(
             {
-                "id": 1,
                 "title": "test",
                 "description": "test",
-                "status": "do zrobienia",
             }
         ),
         content_type="application/json",
@@ -50,10 +48,8 @@ def test_get_tasks(client):
         "/tasks",
         data=json.dumps(
             {
-                "id": 1,
                 "title": "test",
                 "description": "test",
-                "status": "do zrobienia",
             }
         ),
         content_type="application/json",
@@ -75,10 +71,8 @@ def test_get_task(client):
         "/tasks",
         data=json.dumps(
             {
-                "id": 1,
                 "title": "test",
                 "description": "test",
-                "status": "do zrobienia",
             }
         ),
         content_type="application/json",
@@ -98,10 +92,8 @@ def test_update_task(client):
         "/tasks",
         data=json.dumps(
             {
-                "id": 1,
                 "title": "test",
                 "description": "test",
-                "status": "do zrobienia",
             }
         ),
         content_type="application/json",
@@ -126,15 +118,44 @@ def test_update_task(client):
     }
 
 
+def test_update_status(client):
+    client.post(
+        "/tasks",
+        data=json.dumps(
+            {
+                "title": "test",
+                "description": "test",
+            }
+        ),
+        content_type="application/json",
+    )
+    response = client.put(
+        "/tasks/status/1",
+        data=json.dumps(
+            {
+                "title": "test",
+                "description": "test",
+                "status": "w trakcie",
+            }
+        ),
+        content_type="application/json",
+    )
+    assert response.status_code == 200
+    assert response.json == {
+        "id": 1,
+        "title": "test",
+        "description": "test",
+        "status": "w trakcie",
+    }
+
+
 def test_delete_task(client):
     client.post(
         "/tasks",
         data=json.dumps(
             {
-                "id": 1,
                 "title": "test",
                 "description": "test",
-                "status": "do zrobienia",
             }
         ),
         content_type="application/json",

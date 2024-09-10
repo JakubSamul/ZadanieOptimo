@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -8,3 +7,9 @@ class Task:
     title: str
     description: str
     status: str = field(default="do zrobienia")
+
+
+@dataclass
+class TaskCreateModel:
+    title: str
+    description: str

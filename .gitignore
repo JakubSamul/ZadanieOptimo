@@ -3,3 +3,12 @@ __pycache__/
 *$py.class
 instance/
 .webassets-cache
+.env
+.idea/
+.vscode/
+*.db
+*.log
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.json
