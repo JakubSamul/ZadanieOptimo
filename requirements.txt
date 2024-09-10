@@ -1,6 +1,7 @@
 Flask
 black
 pre-commit
-mypy
+mypy                   
+mypy-extensions        
 pytest
 typing-extensions
